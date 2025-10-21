@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import AgentContent from "@/components/Agent/AgentContent";
-import KYCForm from "@/components/KYCForm";
 import DocVault from "@/components/DocVault";
 import { FullPageLoader } from "@/components/ui/Loader";
 import { Home, Users, FileText, Folder } from "lucide-react";
@@ -39,7 +38,7 @@ const AgentDashboard = () => {
         const agentRes = await getAgentDetails(address.toLowerCase());
         const agentData = agentRes.data?.data;
 
-        console.log(" Agent Dashboard Debug:");
+        console.log("Agent Dashboard Debug:");
         console.log("  - Full response:", agentRes);
         console.log("  - Agent data:", agentData);
         console.log("  - Agent name:", agentData?.agent_name);
@@ -48,12 +47,14 @@ const AgentDashboard = () => {
 
         // Check agent KYC status
         const kycRes = await checkAgentKYCStatus(address.toLowerCase());
-        setKycStatus(kycRes.data?.kyc_status);
+        const kycStatusValue = kycRes.data?.kyc_status;
+        setKycStatus(kycStatusValue);
 
-        if (kycRes.data?.kyc_status === "pending") {
-          navigate("/agent/kyc");
-          return;
-        }
+        // // Navigate to /agent/kyc if KYC is pending
+        // if (kycStatusValue === "pending") {
+        //   navigate("/agent/kyc");
+        //   return;
+        // }
 
         // Fetch all customers for agent dashboard
         const customerRes = await getCustomer();
@@ -91,41 +92,19 @@ const AgentDashboard = () => {
 
   const sidebarItems = [
     { id: 'overview', icon: Home, label: 'Overview', onClick: () => setCurrentView('overview') },
-    // Commented out customers navigation - replaced with policy management
-    // { id: 'customers', icon: Users, label: 'Customers', onClick: () => navigate('/agent/customers') },
     { id: 'policy-management', icon: FileText, label: 'Policy Management', onClick: () => setCurrentView('policy-management') },
-    // Commented out policy requests - redundant with overview
-    // { id: 'policy-requests', icon: FileText, label: 'Policy Requests', onClick: () => setCurrentView('overview') },
     { id: 'docvault', icon: Folder, label: 'DocVault', onClick: () => setCurrentView('docvault') },
   ];
 
   const getCurrentView = () => {
     const path = location.pathname;
-    // Commented out customers handling - replaced with policy management
-    // if (path.includes('/customers')) return 'customers';
     if (path.includes('/policy-management')) return 'policy-management';
-    // Commented out claims handling - now focusing on policy requests
-    // if (path.includes('/claims')) return 'claims';
-    // Commented out policy requests handling - redundant with overview
-    // if (path.includes('/policy-requests')) return 'policy-requests';
     return currentView;
   };
 
   const renderContent = () => {
     switch (currentView) {
-      case 'kyc':
-        return (
-          <KYCForm
-            walletAddress={address}
-            role="agent"
-            onClose={() => setCurrentView('overview')}
-            onSubmitKYC={(kycData) => {
-              console.log('Agent KYC submitted:', kycData);
-              setCurrentView('overview');
-              // TODO: optionally refetch agent KYC after submission
-            }}
-          />
-        );
+      // REMOVED: KYC case - now handled by separate route /agent/kyc
       case 'docvault':
         return <DocVault user={user} />;
       case 'policy-management':

@@ -3,7 +3,6 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import CustomerContent from "@/components/Customer/CustomerContent";
 import PayEMIContent from "@/components/Customer/PayEMIContent";
 import PoliciesContent from "@/components/Customer/PoliciesContent";
-import AgentKYCForm from "@/components/AgentKYCForm";
 import PolicyForm from "@/components/PolicyForm";
 import DocVault from "@/components/DocVault";
 import { FullPageLoader } from "@/components/ui/Loader";
@@ -53,12 +52,12 @@ const CustomerDashboard = () => {
         navigate("/");
         return;
       }
-        setLoading(true);
+      setLoading(true);
       try {
         const response = await getCustomer(address.toLowerCase());
         const customerData = response.data?.data?.customer || response.data?.data;
 
-        console.log(" Customer Dashboard Debug:");
+        console.log("Customer Dashboard Debug:");
         console.log("  - Full response:", response);
         console.log("  - Customer data:", customerData);
         console.log("  - Customer name:", customerData?.customer_name);
@@ -66,11 +65,12 @@ const CustomerDashboard = () => {
         setCustomer(customerData);
 
         const kycRes = await checkCustomerKYCStatus(address.toLowerCase());
-        setKycStatus(kycRes.data?.kyc_status);
+        const kycStatusValue = kycRes.data?.kyc_status;
+        setKycStatus(kycStatusValue);
 
-        // Don't automatically navigate to KYC, let user decide from dashboard
-        // if (kycRes.data?.kyc_status === "pending") {
-        //   setCurrentView("kyc");
+        // Navigate to /customer/kyc if KYC is pending (commented out for testing)
+        // if (kycStatusValue === "pending") {
+        //   navigate("/customer/kyc");
         //   return;
         // }
       } catch (err) {
@@ -109,8 +109,7 @@ const CustomerDashboard = () => {
         return <PoliciesContent customer={customer} />;
       case "docvault":
         return <DocVault user={user} />;
-      case "kyc":
-        return <AgentKYCForm />;
+      // REMOVED: KYC case - now handled by separate route /customer/kyc
       case "policy-form":
         return (
           <PolicyForm 
@@ -130,15 +129,17 @@ const CustomerDashboard = () => {
             onPayEMIClick={() => setCurrentView("pay-emi")}
             currentView={currentView}
             setCurrentView={setCurrentView}
-            onKYCSubmit={() => setCurrentView("kyc")}
+            // CHANGED: Navigate to /customer/kyc route instead of switching view
+            onKYCSubmit={() => navigate("/customer/kyc")}
             onCreatePolicy={handleCreatePolicy}
             onPolicySuccess={handlePolicySuccess}
           />
         );
     }
   };
-  {/*remove double sidebar */}
-  const isFullPageView = ["kyc", "policy-form"].includes(currentView);
+  
+  // CHANGED: Remove 'kyc' from fullPageView array since it's now a separate route
+  const isFullPageView = ["policy-form"].includes(currentView);
 
   return (
     <DashboardLayout

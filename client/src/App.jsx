@@ -18,8 +18,7 @@ import AgentCustomerView from "./components/Agent/AgentCustomerView";
 import AgentClaimsView from "./components/Agent/AgentClaimsView";
 import CreatePolicyModal from "./components/Agent/CreatePolicyModal";
 import AddCustomerModal from "./components/Agent/AddCustomerModal";
-import CustomerKYCForm from "./components/CustomerKYCForm";
-import AgentKYCForm from "./components/AgentKYCForm";
+import KycNew from "./components/KycNew";
 // Company Components
 import CompanyAgentsView from "./components/Company/CompanyAgentsView";
 import CompanyCustomersView from "./components/Company/CompanyCustomersView";
@@ -88,28 +87,33 @@ function App() {
         <Route path="/agent/claims" element={<AgentClaimsView withLayout={true} />} />
         <Route path="/agent/create-policy" element={<CreatePolicyModal isOpen={true} onClose={() => window.history.back()} withLayout={true} />} />
         <Route path="/agent/add-customer" element={<AddCustomerModal isOpen={true} onClose={() => window.history.back()} withLayout={true} />} />
+        
+        {/*Updated Customer KYC route to use KycNew */}
         <Route 
-        path="/agent/kyc" 
-        element={
-        <AgentKYCForm 
-        role="agent"
-        isOpen={true} 
-        onClose={() => window.history.back()} withLayout={true} 
-        />} />
+          path="/customer/kyc" 
+          element={
+            <KycNew
+              role="customer"
+              onClose={() => window.history.back()}
+            />
+          } 
+        />
+        
         {/* Customer Dashboard Routes */}
         <Route path="/customer/pay-emi" element={<PayEMIContent />} />
         <Route path="/customer/payment-methods" element={<PaymentMethodContent onBack={() => window.history.back()} />} />
         <Route path="/customer/policies" element={<PoliciesContent />} />
-
+        
+        {/*Updated Agent KYC route to use KycNew */}
         <Route 
-        path="/customer/kyc" 
-        element={
-        <CustomerKYCForm
-        role = "customer"
-        isOpen={true} 
-        onClose={() => window.history.back()} 
-        />} />
-
+          path="/agent/kyc" 
+          element={
+            <KycNew
+              role="agent"
+              onClose={() => window.history.back()}
+            />
+          } 
+        />
         </Routes>
       </ToastProvider>
   );
